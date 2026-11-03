@@ -1,5 +1,7 @@
 # Ecosys: prospecting and landing page pipeline
 
+[![tests](https://github.com/lksuey/ecosys/actions/workflows/tests.yml/badge.svg)](https://github.com/lksuey/ecosys/actions/workflows/tests.yml)
+
 A Python pipeline that finds local businesses without a real website, qualifies them with explicit rules, tracks each one as a Trello card, and, once a human has prepared the inputs, runs Claude Code to build an individual landing page for that business.
 
 The code, configuration and internal documents are written in Portuguese because that is the working language of the project. This README is the English entry point.
