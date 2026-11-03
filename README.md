@@ -68,4 +68,8 @@ To use it for real, create `prospector/.secrets/trello.json` from `prospector/.s
 - The scanner depends on the current Google Maps page structure and will need maintenance when it changes.
 - Business-specific choices (city, neighbourhoods, verticals) are configured for one Brazilian city.
 
+## License
+
+No license file is included. The source is published for portfolio review and no permission to reuse it is granted.
+
 Built with AI assistance; design, domain rules and review by the author.
