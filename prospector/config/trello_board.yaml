@@ -1,0 +1,42 @@
+board:
+  nome: "Ecossistema LP — Prospecção & Produção"
+  descricao: "Prospects de Teresina e produção de landing pages por Claude Code."
+  permissao: private
+
+listas:
+  - "Prospects qualificados"
+  - "Triagem"
+  - "Coleta de ativos"
+  - "Em produção"
+  - "QA técnico"
+  - "Pronto para envio"
+  - "Contato feito"
+  - "Negociação"
+  - "Fechado"
+  - "Descartado"
+
+labels:
+  - { nome: "sem site", cor: red }
+  - { nome: "só whatsapp", cor: orange }
+  - { nome: "só linktree", cor: yellow }
+  - { nome: "site morto", cor: purple }
+
+card_modelo:
+  nome: "MODELO — <Nome do negócio> — <bairro>"
+  descricao: |
+    Prompt:
+
+    Cores:
+
+    Dados do prospecto:
+    - Nome: ...
+    - Endereço: ...
+    - Telefone/WhatsApp: ...
+    - CID: ...
+  checklists:
+    - nome: "Imagens/assets para a pagina anexadas"
+      itens: ["ZIP de assets anexado e conferido"]
+    - nome: "Cores para a landing page definidas"
+      itens: ["Cores preenchidas na descrição"]
+    - nome: "Landing page em produção"
+      itens: ["Produção iniciada"]

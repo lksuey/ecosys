@@ -1,0 +1,226 @@
+# Regras de exclusão e de classificação de link (playbook §13).
+
+# ---------------------------------------------------------------------------
+# 1. Categorias do Google Maps que descartam o registro na hora.
+#    Match por substring, case-insensitive, sobre o texto da categoria da ficha.
+#    Alimentação é regra dura do playbook — nunca fazemos LP para esses.
+# ---------------------------------------------------------------------------
+categorias_denylist:
+  # alimentação
+  - restaurante
+  - lanchonete
+  - fast food
+  - hamburgueria
+  - pizzaria
+  - churrascaria
+  - food truck
+  - trailer
+  - barraca
+  - quiosque
+  - bar
+  - pub
+  - boteco
+  - padaria
+  - confeitaria
+  - cafeteria
+  - café
+  - sorveteria
+  - açaí
+  - acai
+  - pastelaria
+  - tapiocaria
+  - creperia
+  - marmitaria
+  - distribuidora de bebidas
+  - adega
+  - depósito de bebidas
+  # não rende LP de prospecção / tem site corporativo / fora do nicho
+  - posto de gasolina
+  - posto de combustível
+  - farmácia
+  - drogaria
+  - banco
+  - caixa eletrônico
+  - cartório
+  - órgão público
+  - prefeitura
+  - supermercado
+  - hipermercado
+  - mercadinho
+  - atacadista
+  - loja de conveniência
+  - concessionária
+  - oficina mecânica
+  - auto peças
+  - borracharia
+  - motocicleta
+  - loja de motos
+  - revenda de motos
+  - lava jato
+  - lava-jato
+  - ferro velho
+  - materiais de construção
+  - madeireira
+  - vidraçaria
+  - serralheria
+  - loja de ferragens
+  - hospital
+  - upa
+  - posto de saúde
+  # venda de roupa infantil: modelo de estoque/catálogo + checkout no site, não
+  # o 1:1 que este ecossistema prospecta. Aluguel (fantasia/roupa de festa
+  # infantil) não é pego aqui de propósito — continua permitido.
+  - loja de roupas infantis
+  - roupas infantis
+  - moda infantil
+  - vestuário infantil
+  - boutique infantil
+
+# Redes/franquias nacionais: têm site próprio, não são alvo. Match por nome.
+nomes_denylist:
+  - o boticário
+  - boticario
+  - avon
+  - natura
+  - hering
+  - riachuelo
+  - renner
+  - c&a
+  - marisa
+  - pernambucanas
+  - centauro
+  - claro
+  - vivo
+  - tim
+  - oi
+
+# ---------------------------------------------------------------------------
+# 2. Classificação do link do campo "Site" da ficha do Maps.
+#    host = domínio do link, sem www. Primeira regra que casar vence.
+#    Classes que NÃO contam como site → prospect qualificado (se passar no
+#    corte de avaliações). "site_candidato" vai para verificação HTTP.
+# ---------------------------------------------------------------------------
+link_rules:
+  whatsapp:
+    - wa.me
+    - api.whatsapp.com
+    - chat.whatsapp.com
+    - whatsapp.com
+  rede_social:
+    - instagram.com
+    - facebook.com
+    - fb.me
+    - fb.com
+    - m.facebook.com
+    - linkedin.com
+    - tiktok.com
+    - youtube.com
+    - t.me
+    - telegram.me
+    - pinterest.com
+    - br.pinterest.com
+    - pin.it
+    - twitter.com
+    - x.com
+    - threads.net
+    - kwai.com
+  site_gbp:                    # micro-site do Google Meu Negócio — não é site próprio
+    - business.google.com
+    - business.site
+    - negocio.site
+    - sites.google.com
+  agregador:
+    - linktr.ee
+    - linktree.com
+    - beacons.ai
+    - campsite.bio
+    - bio.link
+    - lnk.bio
+    - linkbio.co
+    - about.me
+    - flow.page
+    - linktree.com.br
+    - many.link
+    - solo.to
+    - hoo.be
+    - tap.bio
+    - smallbio.com.br
+    - bio.site
+    - linkk.com.br
+    - meunome.link
+    - linkme.bio
+    - contatinho.link
+    - znap.link
+    - gg.gg
+  marketplace:
+    - mercadolivre.com.br
+    - mercadolivre.com
+    - produto.mercadolivre.com.br
+    - lista.mercadolivre.com.br
+    - elo7.com.br
+    - shopee.com.br
+    - olx.com.br
+    - enjoei.com.br
+    - amazon.com.br
+    - magazineluiza.com.br
+    - ifood.com.br
+
+# ---------------------------------------------------------------------------
+# 3. Verificação de "site_candidato" (HTTP GET seguindo redirects).
+# ---------------------------------------------------------------------------
+verificacao_site:
+  timeout_s: 12
+  # se o domínio próprio redireciona para uma dessas plataformas de loja, a
+  # empresa TEM site (pago) — classe "tem_site", mesmo que a home peça captcha.
+  plataformas_ecommerce:
+    - sistemawbuy.com.br
+    - wbuy.com.br
+    - tray.com.br
+    - lojaintegrada.com.br
+    - nuvemshop.com.br
+    - lojavirtualnuvem.com.br
+    - dooca.store
+    - irroba.com.br
+    - loja2.com.br
+    - myshopify.com
+    - catalog.dooca.store
+  # frases que denunciam domínio estacionado / à venda → classe "site_parqueado"
+  parking_markers:
+    - "domínio à venda"
+    - "domain for sale"
+    - "buy this domain"
+    - "this domain is for sale"
+    - "parkingcrew"
+    - "sedoparking"
+    - "hugedomains"
+    - "está à venda"
+    - "registro.br"          # página de "domínio registrado, sem conteúdo"
+    - "website coming soon"
+    - "em construção"
+    - "under construction"
+  # corpo útil abaixo disso (em caracteres de texto visível) → trata como morto/vazio
+  min_texto_util: 350
+
+# ---------------------------------------------------------------------------
+# 4. Corte de qualificação (playbook §13).
+# ---------------------------------------------------------------------------
+qualificacao:
+  min_avaliacoes: 5          # < 5 avaliações no Maps → Descartados (mesmo com texto)
+  classes_qualificam:
+    - sem_site
+    - whatsapp
+    - rede_social
+    - agregador
+    - site_gbp
+    - site_morto
+    - site_parqueado
+  # "marketplace" fica de fora por padrão (loja já vende online); mova para
+  # classes_qualificam se quiser prospectar quem só tem loja em marketplace.
+
+# ---------------------------------------------------------------------------
+# 5. Captura de avaliações com texto (viram a seção de depoimentos do site).
+# ---------------------------------------------------------------------------
+avaliacoes:
+  capturar_se_min: 5         # só abre a aba de avaliações se houver >= isso
+  alvo_com_texto: 15         # para de rolar depois de coletar ~isso com texto
+  ordenar_por: "mais relevantes"   # "mais relevantes" | "mais recentes"

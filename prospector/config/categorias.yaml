@@ -1,0 +1,177 @@
+# Verticais curadas — negócios de Teresina que rendem landing page de prospecção.
+# Proposta inicial; ajuste à vontade (adicionar/remover verticais, refinar termos).
+#
+# Campos por item:
+#   id            slug curto e estável (usado em logs, colunas, nomes de pasta)
+#   rotulo        nome legível
+#   termos_busca  1-3 frases que o Google Maps entende bem (o scanner roda uma busca
+#                 por termo × local; mais termos = mais cobertura, mais tempo)
+#   schema_type   @type schema.org que o gerador usa no JSON-LD (playbook §7)
+#   prioridade    alta | media | baixa — ordem sugerida de varredura
+#   cobertura     como fatiar geograficamente (o Maps trava ~40-60 resultados/busca):
+#                   cidade  -> 1 busca do centro (nicho, < ~50 negócios na cidade)
+#                   zonas   -> 1 busca por zona (~5: centro, norte, sul, sudeste, leste)
+#                   bairros -> sweep dos bairros ativos (denso, centenas de negócios)
+#                 zonas e bairros vêm de bairros.yaml.
+#
+# NÃO incluir alimentação aqui (ver exclusoes.yaml) — é regra do playbook §13.
+# NÃO incluir venda de roupa infantil — depende de estoque/catálogo e checkout
+# dentro do site (loja tipo e-commerce), não do modelo 1:1 que este ecossistema
+# prospecta. Aluguel (ex.: fantasia infantil, roupa de festa infantil) continua
+# permitido caso vire vertical própria — é um modelo 1:1, diferente de revenda.
+# Reforço por categoria do Maps em exclusoes.yaml.
+
+verticais:
+  - id: moda-feminina
+    rotulo: Moda feminina / boutique
+    termos_busca: ["loja de roupas femininas", "boutique feminina"]
+    schema_type: ClothingStore
+    prioridade: alta
+    cobertura: bairros
+
+  - id: vestidos-festa
+    rotulo: Vestidos de festa, madrinha e debutante
+    termos_busca: ["aluguel de vestidos de festa", "loja de vestidos de festa", "vestido de debutante"]
+    schema_type: ClothingStore
+    prioridade: alta
+    cobertura: cidade
+
+  - id: noivas
+    rotulo: Ateliê de noivas
+    termos_busca: ["ateliê de noivas", "vestido de noiva"]
+    schema_type: BridalShop
+    prioridade: alta
+    cobertura: cidade
+
+  - id: calcados
+    rotulo: Calçados
+    termos_busca: ["loja de calçados", "sapataria"]
+    schema_type: ShoeStore
+    prioridade: media
+    cobertura: zonas
+
+  - id: joalheria
+    rotulo: Joalheria, semijoias e acessórios
+    termos_busca: ["joalheria", "loja de semijoias", "loja de acessórios femininos"]
+    schema_type: JewelryStore
+    prioridade: media
+    cobertura: zonas
+
+  - id: otica
+    rotulo: Ótica
+    termos_busca: ["ótica"]
+    schema_type: Store
+    prioridade: media
+    cobertura: zonas
+
+  - id: salao-beleza
+    rotulo: Salão de beleza / cabeleireiro
+    termos_busca: ["salão de beleza", "cabeleireiro"]
+    schema_type: HairSalon
+    prioridade: alta
+    cobertura: bairros
+
+  - id: estetica
+    rotulo: Estética, depilação e clínica de estética
+    termos_busca: ["clínica de estética", "depilação a laser", "estética facial"]
+    schema_type: BeautySalon
+    prioridade: alta
+    cobertura: bairros
+
+  - id: barbearia
+    rotulo: Barbearia
+    termos_busca: ["barbearia"]
+    schema_type: HairSalon
+    prioridade: baixa
+    cobertura: bairros
+
+  - id: odontologia
+    rotulo: Clínica odontológica
+    termos_busca: ["clínica odontológica", "dentista"]
+    schema_type: Dentist
+    prioridade: media
+    cobertura: zonas
+
+  - id: clinica-medica
+    rotulo: Clínica / consultório médico
+    termos_busca: ["clínica médica", "consultório médico"]
+    schema_type: MedicalClinic
+    prioridade: media
+    cobertura: zonas
+
+  - id: pet
+    rotulo: Pet shop e clínica veterinária
+    termos_busca: ["pet shop", "clínica veterinária"]
+    schema_type: Store
+    prioridade: media
+    cobertura: zonas
+
+  - id: floricultura
+    rotulo: Floricultura
+    termos_busca: ["floricultura"]
+    schema_type: Florist
+    prioridade: baixa
+    cobertura: cidade
+
+  - id: decoracao
+    rotulo: Decoração, móveis e casa
+    termos_busca: ["loja de móveis", "loja de decoração", "artigos para casa"]
+    schema_type: FurnitureStore
+    prioridade: media
+    cobertura: zonas
+
+  - id: acabamento
+    rotulo: Showroom de acabamento (pisos, revestimento, iluminação)
+    termos_busca: ["loja de pisos e revestimentos", "loja de iluminação", "acabamento para construção"]
+    schema_type: HomeGoodsStore
+    prioridade: baixa
+    cobertura: zonas
+
+  - id: academia
+    rotulo: Academia e studio (pilates, crossfit, funcional)
+    termos_busca: ["academia", "studio de pilates", "box de crossfit"]
+    schema_type: ExerciseGym
+    prioridade: media
+    cobertura: bairros
+
+  - id: escola-idiomas
+    rotulo: Escola de idiomas e cursos livres
+    termos_busca: ["escola de idiomas", "curso de inglês", "curso profissionalizante"]
+    schema_type: EducationalOrganization
+    prioridade: baixa
+    cobertura: cidade
+
+  - id: educacao-infantil
+    rotulo: Educação infantil / creche
+    termos_busca: ["creche", "escola de educação infantil"]
+    schema_type: Preschool
+    prioridade: media
+    cobertura: zonas
+
+  - id: fotografia
+    rotulo: Fotografia / estúdio
+    termos_busca: ["estúdio fotográfico", "fotógrafo de ensaios"]
+    schema_type: Photograph
+    prioridade: baixa
+    cobertura: cidade
+
+  - id: casa-festas
+    rotulo: Casa de festas e buffet infantil
+    termos_busca: ["casa de festas infantis", "buffet infantil", "salão de festas"]
+    schema_type: EventVenue
+    prioridade: media
+    cobertura: cidade
+
+  - id: imobiliaria
+    rotulo: Imobiliária
+    termos_busca: ["imobiliária"]
+    schema_type: RealEstateAgent
+    prioridade: baixa
+    cobertura: zonas
+
+  - id: servicos-profissionais
+    rotulo: Advocacia / contabilidade
+    termos_busca: ["escritório de advocacia", "escritório de contabilidade"]
+    schema_type: ProfessionalService
+    prioridade: baixa
+    cobertura: zonas

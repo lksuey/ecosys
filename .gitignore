@@ -1,0 +1,31 @@
+# segredos e credenciais — nunca versionar
+prospector/.secrets/
+*.local.yaml
+prospector/config/trello.yaml
+*.local.json
+
+# índice local do funil, mídia e jobs do Claude; manter em backup fora do Git
+prospector/data/
+prospector/runs/
+prospector/.pw-profile/
+
+# generated sites (output of the pipeline, never versioned)
+Landing Pages/*/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+*.egg-info/
+
+# SO / editor
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+
+# snapshot transitorio do demo de video
+docs/.demo_snapshot.json

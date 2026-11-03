@@ -1,0 +1,65 @@
+# Bairros de Teresina com comércio relevante — alvo da varredura categoria × bairro.
+#
+# lat/lng são APROXIMADOS (centro comercial do bairro) — servem só para centrar o
+# mapa da busca; o nome do bairro no texto da query faz o trabalho pesado. Ajuste
+# um ponto se a busca daquele bairro vier tumultuada de resultados de outro lugar.
+#
+# zoom: 15 cobre ~1 bairro. Baixe para 14 em bairros grandes (Dirceu, Centro).
+#
+# Campos: nome | lat | lng | zoom | ativo (false = pula na varredura)
+
+cidade:
+  nome: Teresina
+  uf: PI
+  centro: { lat: -5.0892, lng: -42.8016, zoom: 13 }   # cobertura "cidade": 1 busca daqui
+
+# cobertura "zonas": 1 busca por zona (query sem nome de bairro). Os centros e o
+# zoom são calibrados pra cada zona render ~40 resultados sem estourar o teto do Maps.
+zonas:
+  - { nome: "Zona Centro",   lat: -5.0890, lng: -42.8020, zoom: 14 }
+  - { nome: "Zona Norte",    lat: -5.0430, lng: -42.8080, zoom: 13 }
+  - { nome: "Zona Sul",      lat: -5.1360, lng: -42.7900, zoom: 13 }
+  - { nome: "Zona Sudeste",  lat: -5.1230, lng: -42.7700, zoom: 13 }
+  - { nome: "Zona Leste",    lat: -5.0650, lng: -42.7800, zoom: 13 }
+
+bairros:
+  - { nome: "Centro",                 lat: -5.0900, lng: -42.8020, zoom: 14, ativo: true }
+  - { nome: "Jóquei",                 lat: -5.0800, lng: -42.7850, zoom: 15, ativo: true }
+  - { nome: "São Cristóvão",          lat: -5.0700, lng: -42.7950, zoom: 15, ativo: true }
+  - { nome: "Fátima",                 lat: -5.0850, lng: -42.7920, zoom: 15, ativo: true }
+  - { nome: "Horto Florestal",        lat: -5.0770, lng: -42.7880, zoom: 15, ativo: true }
+  - { nome: "Ininga",                 lat: -5.0560, lng: -42.7830, zoom: 15, ativo: true }
+  - { nome: "Piçarra",                lat: -5.1000, lng: -42.8060, zoom: 15, ativo: true }
+  - { nome: "Cabral",                 lat: -5.0930, lng: -42.8080, zoom: 15, ativo: true }
+  - { nome: "Marquês de Paranaguá",   lat: -5.0960, lng: -42.8110, zoom: 15, ativo: true }
+  - { nome: "Ilhotas",                lat: -5.0850, lng: -42.8050, zoom: 15, ativo: true }
+  - { nome: "São João",               lat: -5.0800, lng: -42.8000, zoom: 15, ativo: true }
+  - { nome: "Vermelha",               lat: -5.0750, lng: -42.8080, zoom: 15, ativo: true }
+  - { nome: "Noivos",                 lat: -5.0650, lng: -42.7880, zoom: 15, ativo: true }
+  - { nome: "Santa Isabel",           lat: -5.0600, lng: -42.7750, zoom: 15, ativo: true }
+  - { nome: "Recanto das Palmeiras",  lat: -5.0450, lng: -42.7950, zoom: 15, ativo: true }
+  - { nome: "Planalto Uruguai",       lat: -5.0500, lng: -42.7700, zoom: 15, ativo: true }
+  - { nome: "Renascença",             lat: -5.0550, lng: -42.7780, zoom: 15, ativo: true }
+  - { nome: "Zoobotânico",            lat: -5.0600, lng: -42.7830, zoom: 15, ativo: true }
+  - { nome: "Dirceu Arcoverde I",     lat: -5.1230, lng: -42.7720, zoom: 14, ativo: true }
+  - { nome: "Dirceu Arcoverde II",    lat: -5.1300, lng: -42.7650, zoom: 14, ativo: true }
+  - { nome: "Itararé",                lat: -5.1180, lng: -42.7830, zoom: 15, ativo: true }
+  - { nome: "Parque Piauí",           lat: -5.1250, lng: -42.7950, zoom: 15, ativo: true }
+  - { nome: "Lourival Parente",       lat: -5.1400, lng: -42.7850, zoom: 15, ativo: true }
+  - { nome: "Angelim",                lat: -5.1150, lng: -42.7900, zoom: 15, ativo: true }
+  - { nome: "Morada Nova",            lat: -5.1450, lng: -42.7700, zoom: 15, ativo: true }
+  - { nome: "Buenos Aires",           lat: -5.1100, lng: -42.8000, zoom: 15, ativo: true }
+  - { nome: "Bela Vista",             lat: -5.1150, lng: -42.8050, zoom: 15, ativo: true }
+  - { nome: "Monte Castelo",          lat: -5.1000, lng: -42.8100, zoom: 15, ativo: true }
+  - { nome: "Tabuleta",               lat: -5.1050, lng: -42.7900, zoom: 15, ativo: true }
+  - { nome: "Matinha",                lat: -5.1050, lng: -42.8150, zoom: 15, ativo: true }
+  - { nome: "Cristo Rei",             lat: -5.1000, lng: -42.8180, zoom: 15, ativo: true }
+  - { nome: "Água Mineral",           lat: -5.0400, lng: -42.8000, zoom: 15, ativo: true }
+  - { nome: "Poti Velho",             lat: -5.0350, lng: -42.8050, zoom: 15, ativo: false }
+  - { nome: "Mocambinho",             lat: -5.0300, lng: -42.8100, zoom: 14, ativo: true }
+  - { nome: "Satélite",               lat: -5.1400, lng: -42.7600, zoom: 15, ativo: true }
+  - { nome: "Pedra Mole",             lat: -5.1350, lng: -42.7550, zoom: 15, ativo: true }
+  - { nome: "Promorar",               lat: -5.1600, lng: -42.7750, zoom: 15, ativo: false }
+  - { nome: "Gurupi",                 lat: -5.1550, lng: -42.7800, zoom: 15, ativo: false }
+  - { nome: "Parque Ideal",           lat: -5.1450, lng: -42.7950, zoom: 15, ativo: true }
+  - { nome: "Todos os Santos",        lat: -5.0700, lng: -42.7700, zoom: 15, ativo: true }

@@ -1,0 +1,5 @@
+# Prospecção e orquestração local. Claude Code CLI é instalado separadamente.
+playwright>=1.48
+PyYAML>=6.0
+httpx>=0.25.2
+imageio-ffmpeg>=0.5
