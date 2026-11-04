@@ -29,3 +29,11 @@ desktop.ini
 
 # snapshot transitorio do demo de video
 docs/.demo_snapshot.json
+
+*.pem
+*.key
+.env
+.env.*
+!.env.example
+*.log
+node_modules/
