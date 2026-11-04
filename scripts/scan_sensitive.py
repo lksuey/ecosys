@@ -56,7 +56,7 @@ def is_placeholder(kind: str, text: str) -> bool:
     if kind == "email":
         return text.lower().endswith(ALLOWED_EMAIL_DOMAINS)
     if kind in {"trello_object_id", "trello_key_or_token"}:
-        return len(set(text.lower())) <= 3  # 000...0, 000...1 style placeholders
+        return len(set(text.lower())) <= 3
     return False
 
 

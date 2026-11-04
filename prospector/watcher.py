@@ -364,7 +364,6 @@ def tick(log: Log | None = None, limite: int | None = None, slug: str | None = N
                     continue
                 card = cards.get(card_id)
                 if card is None:
-                    # Card arquivado/removido: nunca recriar por engano.
                     continue
                 current = by_id.get(card.get("idList"), "")
                 r["stage"] = current
@@ -393,8 +392,6 @@ def tick(log: Log | None = None, limite: int | None = None, slug: str | None = N
                     card["desc"] = desc
                     acted += 1
                 checklists = _ensure_checklists(tr, card_id, all_checklists.get(card_id, []))
-                # Só as verificações rápidas (desc/checklists) rodam aqui; o Claude
-                # em si roda depois, em paralelo com os outros cards prontos.
                 ready.append((cid, r, card, checklists, before))
                 queued = True
             except Exception as exc:

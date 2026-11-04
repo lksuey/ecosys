@@ -230,7 +230,7 @@ class OptimizationTests(unittest.TestCase):
                 acted = watcher.tick()
                 elapsed = time.monotonic() - started
 
-        self.assertEqual(acted, 0)  # tick() retorna o código de saída, não a contagem
+        self.assertEqual(acted, 0)
         self.assertGreater(max_active[0], 1,
                            "cards prontos deveriam rodar em paralelo, não um de cada vez")
         self.assertLess(elapsed, 0.3 * n_cards,

@@ -94,8 +94,6 @@ class PipelineTests(unittest.TestCase):
         self.assertLess(desc.index("Prompt:"), desc.index("Cores:"))
         self.assertLess(desc.index("Cores:"), desc.index("Dados do prospecto:"))
         self.assertIn("- CID: 123456", desc)
-        # o Prompt já nasce com os requisitos fixos do ecossistema (animações, sem
-        # emoji, pulso no WhatsApp); o usuário escreve a direção do negócio depois deles.
         self.assertEqual(production.extract_prompt(desc), watcher.PROMPT_BASELINE)
         self.assertIn("15 animações", production.extract_prompt(desc))
         self.assertIn("emoji", production.extract_prompt(desc))

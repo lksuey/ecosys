@@ -39,9 +39,6 @@ class TrelloScopeError(TrelloError):
     """Tentativa de operar fora do board do ecossistema — bloqueada."""
 
 
-# --------------------------------------------------------------------------- #
-# auth
-# --------------------------------------------------------------------------- #
 def load_auth() -> dict[str, str]:
     if not SECRET_PATH.exists():
         raise TrelloError(
@@ -60,20 +57,16 @@ def load_resolved() -> dict[str, Any]:
     return {}
 
 
-# --------------------------------------------------------------------------- #
-# cliente escopado
-# --------------------------------------------------------------------------- #
 class Trello:
     def __init__(self, board_id: str | None = None, *, timeout: float = 20.0) -> None:
         self._auth = load_auth()
         self._http = httpx.Client(base_url=API, timeout=timeout)
         self.board_id: str | None = board_id
         self._list_ids: set[str] = set()
-        self._card_board: dict[str, str] = {}  # idCard -> idBoard (cache)
+        self._card_board: dict[str, str] = {}
         if board_id:
             self._load_board_lists()
 
-    # -- infra ----------------------------------------------------------------
     def _req(self, method: str, path: str, **params: Any) -> Any:
         import time
 
@@ -81,7 +74,7 @@ class Trello:
         p.update(self._auth)
         for tentativa in range(4):
             r = self._http.request(method, path, params=p)
-            if r.status_code == 429:  # rate limit
+            if r.status_code == 429:
                 time.sleep(1.5 * (tentativa + 1))
                 continue
             if r.status_code >= 400:
@@ -98,7 +91,6 @@ class Trello:
     def __exit__(self, *exc: object) -> None:
         self.close()
 
-    # -- guarda de escopo ---------------------------------------------------
     def _require_board(self) -> str:
         if not self.board_id:
             raise TrelloScopeError(
@@ -115,7 +107,7 @@ class Trello:
     def _assert_list_on_board(self, id_list: str) -> None:
         self._require_board()
         if id_list not in self._list_ids:
-            self._load_board_lists()  # pode ter sido criada nesta sessão
+            self._load_board_lists()
         if id_list not in self._list_ids:
             raise TrelloScopeError(f"lista {id_list} não pertence ao board do ecossistema")
 
@@ -132,7 +124,6 @@ class Trello:
                 "Operação bloqueada."
             )
 
-    # -- leitura (conta) — só para setup ----------------------------------
     def me(self) -> dict[str, Any]:
         return self._req("GET", "/1/members/me", fields="fullName,username,url")
 
@@ -144,7 +135,6 @@ class Trello:
                 return b
         return None
 
-    # -- leitura (board próprio) -----------------------------------------
     def board(self) -> dict[str, Any]:
         bid = self._require_board()
         return self._req("GET", f"/1/boards/{bid}", fields="id,name,url,closed")
@@ -215,7 +205,6 @@ class Trello:
             raise TrelloError(f"anexo {path.name}: {r.status_code}: {r.text[:200]}")
         return r.json()
 
-    # -- escrita (sempre no board próprio) ------------------------------
     def create_list(self, name: str, *, pos: Any = "bottom") -> dict[str, Any]:
         bid = self._require_board()
         lst = self._req("POST", "/1/lists", name=name, idBoard=bid, pos=pos)
@@ -272,9 +261,6 @@ class Trello:
         return self._req("POST", f"/1/cards/{id_card}/actions/comments", text=text)
 
 
-# --------------------------------------------------------------------------- #
-# setup do board
-# --------------------------------------------------------------------------- #
 def _write_resolved(data: dict[str, Any]) -> None:
     header = (
         "# GERADO por `prospector/trello.py setup` — IDs do board do ecossistema.\n"
@@ -291,7 +277,6 @@ def setup(*, use_existing: str | None = None, force_new: bool = False) -> dict[s
 
     tr = Trello()
 
-    # idempotência: já configurado e o board ainda existe?
     if resolved.get("board_id") and not force_new and not use_existing:
         tr.board_id = resolved["board_id"]
         try:
@@ -302,7 +287,6 @@ def setup(*, use_existing: str | None = None, force_new: bool = False) -> dict[s
         except TrelloError:
             print("board_id em trello.yaml não abre mais — recriando.")
 
-    # checagem de colisão (read-only)
     if not use_existing and not force_new:
         existente = tr.find_board_by_name(nome)
         if existente:
@@ -312,7 +296,6 @@ def setup(*, use_existing: str | None = None, force_new: bool = False) -> dict[s
                 f"  Novo:    trello setup --force-new"
             )
 
-    # criar ou adotar
     if use_existing:
         tr.board_id = use_existing
         board = tr.board()
@@ -327,7 +310,6 @@ def setup(*, use_existing: str | None = None, force_new: bool = False) -> dict[s
         tr.board_id = board["id"]
         print(f"Board criado: {board['name']} ({board['url']})")
 
-    # listas (só cria as que faltam)
     existentes = {lst["name"]: lst["id"] for lst in tr.lists()}
     list_ids: dict[str, str] = {}
     for i, nome_lista in enumerate(spec["listas"]):
@@ -338,7 +320,6 @@ def setup(*, use_existing: str | None = None, force_new: bool = False) -> dict[s
             list_ids[nome_lista] = lst["id"]
             print(f"  + lista: {nome_lista}")
 
-    # labels (só cria as que faltam)
     labels_atuais = {
         lb["name"] for lb in tr._req("GET", f"/1/boards/{tr.board_id}/labels", fields="name")
         if lb.get("name")
@@ -350,7 +331,6 @@ def setup(*, use_existing: str | None = None, force_new: bool = False) -> dict[s
             label_ids[lb["nome"]] = created["id"]
             print(f"  + label: {lb['nome']}")
 
-    # card modelo (só se ainda não existe pelo nome)
     modelo = spec.get("card_modelo")
     modelo_id = resolved.get("card_modelo_id")
     if modelo:
@@ -380,9 +360,6 @@ def setup(*, use_existing: str | None = None, force_new: bool = False) -> dict[s
     return out
 
 
-# --------------------------------------------------------------------------- #
-# comandos (chamados por cli.py)
-# --------------------------------------------------------------------------- #
 def cmd_whoami(_args: Any) -> int:
     with Trello() as tr:
         m = tr.me()

@@ -51,14 +51,11 @@ LATLNG_3D4D_RE = re.compile(r"!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)")
 FIM_DA_LISTA = re.compile(r"chegou ao fim da lista|reached the end of the list", re.I)
 
 
-# --------------------------------------------------------------------------- #
-# util
-# --------------------------------------------------------------------------- #
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
-_FAST = os.environ.get("PROSPECTOR_FAST") == "1"  # só para teste — encurta as pausas
+_FAST = os.environ.get("PROSPECTOR_FAST") == "1"
 
 
 def _sleep(a: float, b: float) -> None:
@@ -82,9 +79,6 @@ def _cid_from_ftid(ftid: str) -> str | None:
         return None
 
 
-# --------------------------------------------------------------------------- #
-# ledger de dedup
-# --------------------------------------------------------------------------- #
 class Ledger:
     def __init__(self, path: Path = LEDGER_PATH) -> None:
         self.path = path
@@ -109,9 +103,6 @@ class Ledger:
         return len(self._seen)
 
 
-# --------------------------------------------------------------------------- #
-# escrita da run
-# --------------------------------------------------------------------------- #
 @dataclass
 class RunWriter:
     run_id: str
@@ -142,9 +133,6 @@ class RunWriter:
         return d
 
 
-# --------------------------------------------------------------------------- #
-# extração de uma ficha aberta
-# --------------------------------------------------------------------------- #
 def _txt(page, selector: str) -> str | None:
     try:
         loc = page.locator(selector).first
@@ -167,10 +155,8 @@ def _attr(page, selector: str, name: str) -> str | None:
 
 
 def _parse_nota_e_avaliacoes(page) -> tuple[float | None, int | None]:
-    # bloco "F7nice": <span>4,7</span> ... <span>(1.234)</span>
     raw = _txt(page, "div.F7nice")
     if not raw:
-        # fallback: aria-label do bloco de estrelas
         raw = _attr(page, 'div.F7nice span[role="img"]', "aria-label") or ""
     nota = None
     n = None
@@ -197,7 +183,6 @@ def _extract_place(page, ctx: dict) -> dict | None:
     m_ft = FTID_RE.search(url)
     ftid = m_ft.group(1) if m_ft else None
     if not ftid:
-        # às vezes precisa de um instante para a URL virar /place/...
         _sleep(1.0, 1.8)
         url = page.url
         m_ft = FTID_RE.search(url)
@@ -278,13 +263,7 @@ def _extract_place(page, ctx: dict) -> dict | None:
     return rec
 
 
-# O texto das avaliações não é necessário à prospecção. Abrir a aba e rolar
-# centenas de avaliações deixaria o scan lento e frágil. Basta a contagem.
 
-
-# --------------------------------------------------------------------------- #
-# consentimento / captcha
-# --------------------------------------------------------------------------- #
 _CONSENT_BTN = (
     'button[aria-label="Aceitar tudo"]', 'button[aria-label="Rejeitar tudo"]',
     'button[aria-label="Accept all"]', 'button[aria-label="Reject all"]',
@@ -336,9 +315,6 @@ def _check_captcha(page, writer: RunWriter, pause: bool) -> None:
     input("\n>>> Resolva o CAPTCHA na janela do Chrome e tecle ENTER para continuar...\n")
 
 
-# --------------------------------------------------------------------------- #
-# leitura dos cards da lista (nota + nº de avaliações — mais confiável que a ficha)
-# --------------------------------------------------------------------------- #
 _FEED_JS = r"""() => [...document.querySelectorAll('div.Nv2PK')].map(c => {
   const a = c.querySelector('a.hfpxzc');
   const w4 = [...c.querySelectorAll('.W4Efsd')].map(x => x.textContent || '');
@@ -356,10 +332,10 @@ def _feed_categoria(w4: list[str]) -> str | None:
     """A categoria costuma ser o 1º trecho, antes do ' · ', de um dos spans W4Efsd."""
     for txt in w4:
         t = (txt or "").replace(" ", " ").strip()
-        if not t or re.match(r"^\d+[.,]\d", t):  # é a nota
+        if not t or re.match(r"^\d+[.,]\d", t):
             continue
         cat = t.split("·")[0].strip()
-        if cat and not re.search(r"\d{2,}", cat):  # não é endereço/telefone
+        if cat and not re.search(r"\d{2,}", cat):
             return cat
     return None
 
@@ -396,9 +372,6 @@ def _collect_feed(page) -> list[dict]:
     return out
 
 
-# --------------------------------------------------------------------------- #
-# varredura de um (termo, bairro)
-# --------------------------------------------------------------------------- #
 def _scan_combo(page, vert: config.Vertical, termo: str, bairro: config.Bairro,
                 incluir_nome: bool, run_id: str, ledger: Ledger, writer: RunWriter,
                 exc: config.Exclusoes, limite: int | None, pause: bool,
@@ -412,7 +385,6 @@ def _scan_combo(page, vert: config.Vertical, termo: str, bairro: config.Bairro,
     _dismiss_consent(page, writer)
     _check_captcha(page, writer, pause)
 
-    # às vezes o Maps abre direto numa ficha (1 resultado) — trata como feed de 1
     feed = page.locator('div[role="feed"]')
     try:
         feed.wait_for(timeout=8000)
@@ -420,8 +392,6 @@ def _scan_combo(page, vert: config.Vertical, termo: str, bairro: config.Bairro,
         writer.log("    (sem feed — 0 resultados ou layout inesperado)")
         return 0, 0, 0
 
-    # rola até o fim (o Maps limita ~40-60 resultados por busca; a parada real é
-    # por estagnação — o rodapé "chegou ao fim" nem sempre renderiza no headless)
     prev = -1
     estagnado = 0
     for _ in range(30):
@@ -454,11 +424,9 @@ def _scan_combo(page, vert: config.Vertical, termo: str, bairro: config.Bairro,
             pulados += 1
             continue
 
-        # Pré-filtro pelo card da lista: evita abrir a ficha de quem já dá pra
-        # descartar (poucas avaliações ou categoria na denylist). Registra leve.
         n_feed = ficha["n_avaliacoes"]
         if n_feed is None and ficha["nota"] is None:
-            n_feed = 0  # sem estrela nem contagem no card = sem avaliações
+            n_feed = 0
         cat_feed = ficha["categoria"]
         motivo_pre = None
         if n_feed is not None and n_feed < exc.min_avaliacoes:
@@ -483,7 +451,7 @@ def _scan_combo(page, vert: config.Vertical, termo: str, bairro: config.Bairro,
 
         try:
             page.goto(href, wait_until="domcontentloaded", timeout=40000)
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:
             writer.log(f"    [{idx}] goto falhou ({nome_card}): {e}")
             continue
         _sleep(1.6, 3.2)
@@ -499,7 +467,6 @@ def _scan_combo(page, vert: config.Vertical, termo: str, bairro: config.Bairro,
             pulados += 1
             continue
 
-        # nota e nº de avaliações vêm do card da lista (mais confiável que a ficha)
         if ficha["nota"] is not None:
             rec["nota"] = ficha["nota"]
         if ficha["n_avaliacoes"] is not None:
@@ -510,7 +477,6 @@ def _scan_combo(page, vert: config.Vertical, termo: str, bairro: config.Bairro,
         motivo = exc.motivo_denylist(rec["categoria_maps"], rec["nome"])
         rec["excluir_denylist"] = bool(motivo)
         rec["motivo_denylist"] = motivo
-        # Apenas a contagem de avaliações é usada (rec["n_avaliacoes"], do card).
 
         writer.record(rec)
         ledger.add(rec["ftid"], rec["nome"])
@@ -529,10 +495,7 @@ def _scan_combo(page, vert: config.Vertical, termo: str, bairro: config.Bairro,
     return novos, pulados, descartados
 
 
-# --------------------------------------------------------------------------- #
-# entrada
-# --------------------------------------------------------------------------- #
-Combo = tuple[config.Vertical, str, config.Bairro, bool]  # (vertical, termo, local, incluir_nome)
+Combo = tuple[config.Vertical, str, config.Bairro, bool]
 
 
 def _locais(cfg: config.Config, vert: config.Vertical,
@@ -551,7 +514,7 @@ def _locais(cfg: config.Config, vert: config.Vertical,
         return [(cfg.centro, False)]
     if modo == "zonas":
         return [(z, False) for z in cfg.zonas]
-    return [(b, True) for b in cfg.bairros_ativos]  # bairros
+    return [(b, True) for b in cfg.bairros_ativos]
 
 
 def _iter_combos(cfg: config.Config, verticais: list[str] | None,
@@ -594,8 +557,6 @@ def run(verticais: list[str] | None = None, bairros: list[str] | None = None, *,
             viewport={"width": 1360, "height": 900},
             args=["--disable-blink-features=AutomationControlled"],
         )
-        # Chrome real evita a página degradada que o Google serve ao Chromium
-        # empacotado (sem nº de avaliações). Cai para chromium se não houver Chrome.
         try:
             ctx = p.chromium.launch_persistent_context(channel="chrome", **launch_kwargs)
             writer.log("  navegador: Google Chrome (channel=chrome)")
@@ -621,7 +582,7 @@ def run(verticais: list[str] | None = None, bairros: list[str] | None = None, *,
                     writer.log(f"ABORTADO: {e}")
                     had_failure = True
                     break
-                except Exception as e:  # noqa: BLE001
+                except Exception as e:
                     writer.log(f"combo falhou: {type(e).__name__}: {e}")
                     had_failure = True
                 _sleep(8.0, 20.0)

@@ -42,17 +42,14 @@ class ConfigError(ValueError):
     """YAML de configuração inválido ou incompleto."""
 
 
-# --------------------------------------------------------------------------- #
-# categorias.yaml
-# --------------------------------------------------------------------------- #
 @dataclass(frozen=True)
 class Vertical:
     id: str
     rotulo: str
     termos_busca: tuple[str, ...]
     schema_type: str
-    prioridade: str  # alta | media | baixa
-    cobertura: str = "zonas"  # cidade | zonas | bairros
+    prioridade: str
+    cobertura: str = "zonas"
 
     _PRIORIDADES = ("alta", "media", "baixa")
     _COBERTURAS = ("cidade", "zonas", "bairros")
@@ -73,9 +70,6 @@ class Vertical:
             )
 
 
-# --------------------------------------------------------------------------- #
-# bairros.yaml
-# --------------------------------------------------------------------------- #
 @dataclass(frozen=True)
 class Bairro:
     nome: str
@@ -94,9 +88,6 @@ class Bairro:
             raise ConfigError(f"bairro {self.nome!r}: zoom {self.zoom} fora de 10..18")
 
 
-# --------------------------------------------------------------------------- #
-# exclusoes.yaml
-# --------------------------------------------------------------------------- #
 @dataclass(frozen=True)
 class Exclusoes:
     categorias_denylist: tuple[str, ...]
@@ -184,7 +175,7 @@ def _load_yaml(nome: str) -> Any:
         raise ConfigError(f"config ausente: {caminho}")
     try:
         return yaml.safe_load(caminho.read_text(encoding="utf-8"))
-    except yaml.YAMLError as exc:  # pragma: no cover - mensagem de erro
+    except yaml.YAMLError as exc:
         raise ConfigError(f"{nome}: YAML malformado — {exc}") from exc
 
 

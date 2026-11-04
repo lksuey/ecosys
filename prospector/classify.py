@@ -29,12 +29,9 @@ RUNS_DIR = BASE / "runs"
 
 _UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
        "(KHTML, like Gecko) Chrome/122.0 Safari/537.36")
-_BODY_CAP = 120_000  # bytes lidos do corpo para detectar parking
+_BODY_CAP = 120_000
 
 
-# --------------------------------------------------------------------------- #
-# helpers
-# --------------------------------------------------------------------------- #
 def _host(url: str) -> str:
     try:
         h = (urlparse(url).hostname or "").lower()
@@ -52,15 +49,14 @@ def _e164_br(raw: str | None) -> str | None:
         return None
     if d.startswith("55") and len(d) in (12, 13):
         return "+" + d
-    if len(d) in (10, 11):  # DDD + 8/9 dígitos
+    if len(d) in (10, 11):
         return "+55" + d
-    if len(d) in (8, 9):  # sem DDD — não dá pra confiar, guarda como está
+    if len(d) in (8, 9):
         return None
     return "+" + d if len(d) >= 12 else None
 
 
 _BAIRRO_RE = re.compile(r"-\s*([A-Za-zÀ-ÿ0-9'.()\s]+?)\s*,\s*Teresina", re.I)
-# fora do alvo: Timon-MA (do outro lado do rio) e outras cidades do PI
 _FORA_RE = re.compile(r"\bTimon\b|,\s*MA\b|-\s*MA\b|\bAltos\s*-\s*PI|\bJosé de Freitas|"
                       r"\bUni[aã]o\s*-\s*PI|\bDemerval Lob[aã]o|\bMiguel Alves|\bCoivaras", re.I)
 
@@ -70,7 +66,6 @@ def _fora_de_teresina(endereco: str | None) -> bool:
         return False
     if _FORA_RE.search(endereco):
         return True
-    # endereço com cidade explícita que não é Teresina
     return bool(re.search(r",\s*[A-Z][a-zÀ-ÿ]+\s*-\s*(PI|MA)\b", endereco)) and \
         "teresina" not in endereco.lower()
 
@@ -80,15 +75,12 @@ def _bairro_do_endereco(endereco: str | None) -> str | None:
         return None
     m = _BAIRRO_RE.search(endereco)
     if m:
-        b = re.sub(r"\s*\(.*?\)\s*", "", m.group(1)).strip()  # "Centro (Sul)" -> "Centro"
-        b = re.sub(r"^\d+\s*", "", b)  # tira número de porta que às vezes sobra
+        b = re.sub(r"\s*\(.*?\)\s*", "", m.group(1)).strip()
+        b = re.sub(r"^\d+\s*", "", b)
         return b or None
     return None
 
 
-# --------------------------------------------------------------------------- #
-# verificação HTTP de site_candidato
-# --------------------------------------------------------------------------- #
 def _verificar_site(url: str, exc: config.Exclusoes,
                     client: httpx.Client) -> tuple[str, str | None, int | None]:
     """Retorna (classe, url_final, status)."""
@@ -128,9 +120,6 @@ def _verificar_site(url: str, exc: config.Exclusoes,
     return "tem_site", url, status
 
 
-# --------------------------------------------------------------------------- #
-# classificação de um registro
-# --------------------------------------------------------------------------- #
 def classificar(rec: dict, exc: config.Exclusoes, client: httpx.Client) -> dict:
     rec["telefone_e164"] = _e164_br(rec.get("telefone"))
     rec["bairro_real"] = _bairro_do_endereco(rec.get("endereco"))
@@ -159,9 +148,6 @@ def classificar(rec: dict, exc: config.Exclusoes, client: httpx.Client) -> dict:
     return rec
 
 
-# --------------------------------------------------------------------------- #
-# entrada
-# --------------------------------------------------------------------------- #
 def _run_dir(run: str | None) -> Path:
     if run:
         d = RUNS_DIR / run

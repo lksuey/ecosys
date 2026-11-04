@@ -22,7 +22,7 @@ COLORS_RE = re.compile(r"(?ims)^cores\s*:\s*(.*?)\s*^dados do prospecto\s*:")
 MAX_FILES = 150
 MAX_UNCOMPRESSED = 600 * 1024 * 1024
 MEDIA_EXT = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".mp4", ".mov"}
-MAX_ATTACHMENT_BYTES = 9_500_000  # margem abaixo do limite de 10 MB de anexo do Trello
+MAX_ATTACHMENT_BYTES = 9_500_000
 
 
 def artifact_slug(slug: str, card_id: str) -> str:
@@ -286,9 +286,6 @@ def _browser_checks(site: Path, qa: Path) -> list[str]:
                 page_errors: list[str] = []
                 page.on("pageerror", lambda error: page_errors.append(str(error)[:120]))
                 page.goto((site / "index.html").resolve().as_uri(), wait_until="load", timeout=30000)
-                # `loading="lazy"` é esperado e correto; força o carregamento antes de
-                # checar imagens quebradas, senão as que estão fora da viewport nunca
-                # chegam a ser pedidas e aparecem como falso-positivo.
                 page.evaluate("""async () => {
                     document.querySelectorAll('img[loading="lazy"]').forEach(img => { img.loading = 'eager'; });
                     await Promise.all([...document.images].map(img => img.complete ? null :

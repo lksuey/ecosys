@@ -1,6 +1,4 @@
 @echo off
-REM Desativa watcher e prospeccao. Processos em andamento terminam sozinhos.
-REM Pra religar: start.bat
 
 schtasks /Change /TN "Ecosys - watcher" /DISABLE >nul 2>&1
 schtasks /Change /TN "Ecosys - prospect" /DISABLE >nul 2>&1

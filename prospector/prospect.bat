@@ -1,5 +1,4 @@
 @echo off
-REM Executa um lote de prospecção sem bloquear a produção de landing pages.
 cd /d "%~dp0.."
 set PROSPECTOR_FAST=
 set PYTHONUTF8=1

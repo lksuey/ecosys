@@ -1,6 +1,4 @@
 @echo off
-REM Liga duas tarefas independentes: watcher e prospecção em lotes.
-REM Exige Claude Code CLI instalado/autenticado. Ver playbook-LP.md.
 
 where claude >nul 2>nul
 if errorlevel 1 (
